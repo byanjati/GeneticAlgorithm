@@ -1,0 +1,94 @@
+import random
+import numpy as np
+from math import exp
+import math
+import operator
+
+percobaan = 0
+jumPop = 20
+lengthVar = 4
+
+def fungsi_fitness_test(a,b):
+	return 100*(a**2 - b) + (1-a)**2
+
+def fungsi_fitness(list1):
+	a = list1[0]
+	b = list1[1]
+	return 100*(a**2 - b) + (1-a)**2
+
+def generate_random(i,jum):
+	r1 = random.randrange(0,jum)
+	while(i==r1):
+		r1 = random.randrange(0,jum)
+
+	return r1
+
+def kompetisi(list1,list2,q):
+	list3 = list1 + list2
+	list_kompetisi = {}
+	
+	i = 0
+	for i in range(len(list3)):
+		nilai = 0
+		j = 0
+		for j in range(q):
+			r1 = generate_random(i,jumPop*2)
+			if(fungsi_fitness(list3[i])<fungsi_fitness(list3[r1])):
+				nilai += 1
+
+		list_kompetisi[i] = nilai
+
+	return list_kompetisi
+
+kromosom = [[random.uniform(-5.12,5.12) for i in range(lengthVar)]for j in range(jumPop)]
+
+for percobaan in range(1000):
+	calon_kromosom = []
+
+	for i in kromosom:
+		mutation = i[2:4]
+		value = i[0:2]
+		mu, sigma = 0, 0.1 # mean and standard deviation
+		s = np.random.normal(mu, sigma, 1)
+		normal_db = s[0]
+
+		for i in range(2):
+			mutation[i] = mutation[i]*(1+(0.2)*(np.random.normal(mu, sigma, 1)[0]))
+			if(mutation[i]<np.finfo(float).eps):
+				mutation[i] = np.finfo(float).eps 
+				
+			value[i] = value[i] + mutation[i]*normal_db
+
+		kromosom_baru = value + mutation
+		calon_kromosom.append(kromosom_baru)
+
+	next_population = kompetisi(kromosom,calon_kromosom,10);
+
+	sorted_x = sorted(next_population.items(), key=operator.itemgetter(1))
+
+	list_next_pop = []
+
+	for i in sorted_x:
+		list_next_pop.append(i[0])
+
+	list_next_pop = list_next_pop[jumPop-1:jumPop*2-1]
+
+	list_combine = kromosom + calon_kromosom
+
+	final_kromosom = []
+
+	i = 0
+	for i in range(len(list_combine)):
+		if(i in list_next_pop):
+			final_kromosom.append(list_combine[i])
+
+	kromosom = final_kromosom
+	# print final_kromosom[0]
+
+list_fitness = {}
+
+for i in kromosom:
+	list_fitness[fungsi_fitness(i)] = i
+
+print min(list_fitness)
+print list_fitness[min(list_fitness)]
