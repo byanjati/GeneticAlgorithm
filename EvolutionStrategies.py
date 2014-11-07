@@ -14,7 +14,7 @@ jumPop = 20
 lengthVar = 3
 
 # inisialisasi individu
-kromosom = [[random.uniform(-2,2) for i in range(lengthVar)]for j in range(jumPop)]
+kromosom = [[random.uniform(-5.12,5.12) for i in range(lengthVar)]for j in range(jumPop)]
 
 for i in range(150):
 	anak = []
@@ -39,11 +39,15 @@ for i in range(150):
 	for i in range(jumPop/2):
 		for j in range(lengthVar):
 			if(j<2):
-				anak[i][j] = anak[i][j] + anak[i][2]*normal_db
+				temp  = anak[i][j] + anak[i][2]*normal_db
+				if((temp<5.12)and(temp>-5.12)):
+					anak[i][j] = anak[i][j] + anak[i][2]*normal_db
 			else:
-				anak[i][j] = anak[i][j]*exp(t*normal_db)
-				if(anak[i][j] < 8.854*(10 ** -12)):
-					anak[i][j] = 8.854*(10 ** -12)
+				temp  = anak[i][j]*exp(t*normal_db)
+				if((temp<5.12)and(temp>-5.12)):
+					anak[i][j] = anak[i][j]*exp(t*normal_db)
+					if(anak[i][j] < 8.854*(10 ** -12)):
+						anak[i][j] = 8.854*(10 ** -12)
 
 	# for i in range(jumPop/2):
 	# 	print anak[i]
@@ -51,12 +55,12 @@ for i in range(150):
 	for i in range(len(anak)):
 		kromosom.append(anak[i])
 
-	def fungsi_fitness(x1,x2,bilkecil):
-		total = x1 ** 2 + x2 ** 2;
+	def fungsi_fitness(a,b,bilkecil):
+		total = 100*(a**2 - b)**2 + (1-a)**2
 		total += bilkecil
 		return 100 - 1/total
 
-	fitness = [fungsi_fitness(kromosom[i][0],kromosom[i][1],0.01) for i in range(len(kromosom))]
+	fitness = {fungsi_fitness(kromosom[i][0],kromosom[i][1],0.01):[kromosom[i][0],kromosom[i][1]] for i in range(len(kromosom))}
 
+print fitness[max(fitness)]
 print max(fitness)
-
